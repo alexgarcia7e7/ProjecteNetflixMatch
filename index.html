@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netflix Match - Troba què veure amb els teus amics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #E50914;
+      --primary-hover: #f40612;
+      --bg-dark: #141414;
+      --card-bg: #1f1f1f;
+      --card-hover: #2a2a2a;
+      --text-main: #ffffff;
+      --text-muted: #aaaaaa;
+      --like-green: #12803b;
+      --like-green-hover: #169e49;
+      --dislike-red: #9e2424;
+      --dislike-red-hover: #be2d2d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 50px;
+    }
+
+    header {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0) 100%);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      color: var(--primary);
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 0 20px;
+      margin-top: 20px;
+    }
+
+    .hero-card {
+      background: #181818;
+      border-radius: 16px;
+      padding: 35px 30px;
+      margin-bottom: 35px;
+      border: 1px solid #282828;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .hero-title-sub {
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 16px;
+      margin-bottom: 25px;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: #2b2b2b;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #383838;
+      transform: translateY(-2px);
+    }
+
+    .room-code-badge {
+      background: #252525;
+      border: 1px dashed var(--primary);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .participants-list {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .participant-chip {
+      background: #333;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .participant-chip.active {
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .carousel-container {
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 15px;
+      scroll-behavior: smooth;
+    }
+
+    .carousel::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .carousel::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 10px;
+    }
+
+    .trending-card {
+      min-width: 240px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .trending-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--primary);
+    }
+
+    .trending-img {
+      width: 100%;
+      height: 330px;
+      object-fit: cover;
+    }
+
+    .trending-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(229, 9, 20, 0.9);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .trending-info {
+      padding: 12px;
+    }
+
+    .trending-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .trending-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .voting-section {
+      background: #181818;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 35px;
+      border: 1px solid #282828;
+    }
+
+    .voting-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .voting-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .movie-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .movie-poster-large {
+      width: 100%;
+      max-width: 320px;
+      height: 450px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    }
+
+    .movie-details {
+      text-align: center;
+    }
+
+    .movie-details h3 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .vote-actions {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 15px;
+    }
+
+    .btn-like {
+      background-color: var(--like-green);
+      color: white;
+      flex: 1;
+      padding: 22px;
+      font-size: 18px;
+    }
+
+    .btn-like:hover {
+      background-color: var(--like-green-hover);
+    }
+
+    .btn-dislike {
+      background-color: var(--dislike-red);
+      color: white;
+      flex: 1;
+      padding: 22px;
+      font-size: 18px;
+    }
+
+    .btn-dislike:hover {
+      background-color: var(--dislike-red-hover);
+    }
+
+    .results-section {
+      background: #181818;
+      border-radius: 16px;
+      padding: 30px;
+      border: 1px solid #282828;
+    }
+
+    .winner-card {
+      background: linear-gradient(135deg, rgba(229,9,20,0.2) 0%, rgba(20,20,20,1) 100%);
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      padding: 25px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .winner-poster {
+      width: 110px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .winner-info h4 {
+      font-size: 22px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .match-tag {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .results-table th, .results-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .results-table th {
+      color: var(--text-muted);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">NETFLIX MATCH</div>
+  </header>
+
+  <div class="container">
+    
+    <!-- SECTION 1: HERO & CREAR GRUP -->
+    <div class="hero-card">
+      <div class="hero-title-sub">NETFLIX MATCH</div>
+      <h1 class="hero-title">Què veiem avui?</h1>
+      <p class="hero-desc">Troba una pel·lícula que agradi a tot el grup sense perdre temps decidint.</p>
+      
+      <div id="group-setup">
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="createGroup()">CREAR UN GRUP</button>
+          <button class="btn btn-secondary" onclick="joinGroup()">UNIR-ME A UN GRUP</button>
+        </div>
+      </div>
+
+      <div id="room-active" class="hidden">
+        <div class="room-code-badge">
+          Codi de la Sala: <span id="code-display" style="color: var(--primary);">NET-8492</span>
+        </div>
+        <div class="participants-list">
+          <div class="participant-chip active">👤 Persona 1 (Tu)</div>
+          <div class="participant-chip">👤 Persona 2</div>
+          <div class="participant-chip">👤 Persona 3</div>
+          <div class="participant-chip">👤 Persona 4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: EN TENDÈNCIA (CARTELLERA REDISSENYADA) -->
+    <div class="section-header">
+      <h2 class="section-title">🔥 Tendències de la Setmana</h2>
+    </div>
+
+    <div class="carousel-container">
+      <div class="carousel">
+        <div class="trending-card">
+          <span class="trending-badge">Top 1</span>
+          <img src="img/cronicas-vampiricas.jpg" class="trending-img" alt="Crónicas vampíricas">
+          <div class="trending-info">
+            <div class="trending-title">Crónicas vampíricas</div>
+            <div class="trending-meta">Fantasia • Drama</div>
+          </div>
+        </div>
+
+        <div class="trending-card">
+          <span class="trending-badge">Top 2</span>
+          <img src="img/un-cuento-perfecto.jpg" class="trending-img" alt="Un cuento perfecto">
+          <div class="trending-info">
+            <div class="trending-title">Un cuento perfecto</div>
+            <div class="trending-meta">Romanç • Drama</div>
+          </div>
+        </div>
+
+        <div class="trending-card">
+          <span class="trending-badge">Top 3</span>
+          <img src="img/gossip-girl.jpg" class="trending-img" alt="Gossip Girl">
+          <div class="trending-info">
+            <div class="trending-title">Gossip Girl</div>
+            <div class="trending-meta">Drama • Adolescent</div>
+          </div>
+        </div>
+
+        <div class="trending-card">
+          <span class="trending-badge">Top 4</span>
+          <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=500&auto=format&fit=crop" class="trending-img" alt="Stranger Things">
+          <div class="trending-info">
+            <div class="trending-title">Stranger Things</div>
+            <div class="trending-meta">Ciència-Ficció</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: VOTACIÓ -->
+    <div class="voting-section">
+      <div class="voting-header">
+        <h2>Quina t'agradaria veure?</h2>
+      </div>
+
+      <div class="movie-display">
+        <img id="current-poster" src="img/cronicas-vampiricas.jpg" class="movie-poster-large" alt="Movie">
+        <div class="movie-details">
+          <h3 id="current-title">Crónicas vampíricas</h3>
+          <p id="current-genre" style="color: var(--text-muted);">Fantasia / Drama</p>
+        </div>
+
+        <div class="vote-actions">
+          <button class="btn btn-like" onclick="vote('like')">👍 LIKE</button>
+          <button class="btn btn-dislike" onclick="vote('dislike')">👎 DISLIKE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: RESULTATS I GUANYADORA -->
+    <div id="results-block" class="results-section hidden">
+      <div class="section-header">
+        <h2 class="section-title">🏆 Pel·lícula Guanyadora</h2>
+      </div>
+
+      <div class="winner-card">
+        <img id="winner-poster" src="img/cronicas-vampiricas.jpg" class="winner-poster" alt="Winner">
+        <div class="winner-info">
+          <h4 id="winner-title">Crónicas vampíricas</h4>
+          <span class="match-tag">100% COINCIDÈNCIA DEL GRUP</span>
+          <p style="color: var(--text-muted); margin-top: 8px; font-size: 14px;">Tots els participants han donat LIKE a aquesta opció!</p>
+        </div>
+      </div>
+
+      <h3 style="font-size: 18px; margin-bottom: 15px;">Resum de Votacions</h3>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Participant</th>
+            <th>Vot</th>
+          </tr>
+        </thead>
+        <tbody id="votes-summary">
+          <tr>
+            <td>Persona 1 (Tu)</td>
+            <td style="color: var(--like-green); font-weight: 700;">👍 LIKE</td>
+          </tr>
+          <tr>
+            <td>Persona 2</td>
+            <td style="color: var(--like-green); font-weight: 700;">👍 LIKE</td>
+          </tr>
+          <tr>
+            <td>Persona 3</td>
+            <td style="color: var(--like-green); font-weight: 700;">👍 LIKE</td>
+          </tr>
+          <tr>
+            <td>Persona 4</td>
+            <td style="color: var(--like-green); font-weight: 700;">👍 LIKE</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    const movies = [
+      {
+        title: "Crónicas vampíricas",
+        genre: "Fantasia / Drama",
+        img: "img/cronicas-vampiricas.jpg"
+      },
+      {
+        title: "Un cuento perfecto",
+        genre: "Romanç / Drama",
+        img: "img/un-cuento-perfecto.jpg"
+      },
+      {
+        title: "Gossip Girl",
+        genre: "Drama / Adolescent",
+        img: "img/gossip-girl.jpg"
+      }
+    ];
+
+    let currentIndex = 0;
+
+    function createGroup() {
+      document.getElementById('group-setup').classList.add('hidden');
+      document.getElementById('room-active').classList.remove('hidden');
+    }
+
+    function joinGroup() {
+      const code = prompt("Introdueix el codi de la sala (Ex: NET-8492):");
+      if (code) {
+        document.getElementById('code-display').innerText = code.toUpperCase();
+        createGroup();
+      }
+    }
+
+    function vote(type) {
+      if (currentIndex < movies.length - 1) {
+        currentIndex++;
+        document.getElementById('current-poster').src = movies[currentIndex].img;
+        document.getElementById('current-title').innerText = movies[currentIndex].title;
+        document.getElementById('current-genre').innerText = movies[currentIndex].genre;
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.querySelector('.voting-section').classList.add('hidden');
+      document.getElementById('results-block').classList.remove('hidden');
+      document.getElementById('results-block').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
